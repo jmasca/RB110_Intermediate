@@ -61,7 +61,15 @@ def player_places_marker!(brd)
 end
 
 def computer_places_marker!(brd)
-  square = empty_squares(brd).sample
+  square = offense(brd, square)
+  square = defense(brd, square) if !square
+
+  if !square && brd[5] == INITIAL_MARKER
+    square = 5
+  elsif !square
+    square = empty_squares(brd).sample
+  end
+
   brd[square] = COMPUTER_MARKER
 end
 
@@ -137,12 +145,38 @@ def display_game_result(brd, scores, result)
 end
 
 def place_marker!(brd, current_player)
-  current_player == 'player' ? player_places_marker!(brd) : computer_places_marker!(brd)
+  if current_player == 'player'
+    player_places_marker!(brd)
+  else
+    computer_places_marker!(brd)
+  end
 end
 
 def alternate_player(current_player)
   return 'player' if current_player == 'computer'
   'computer'
+end
+
+def offense(brd, sqr)
+  WINNING_LINES.each do |line|
+    sqr = find_risk_or_win(line, brd, COMPUTER_MARKER)
+    return sqr if sqr
+  end
+  nil
+end
+
+def defense(brd, sqr)
+  WINNING_LINES.each do |line|
+    sqr = find_risk_or_win(line, brd, PLAYER_MARKER)
+    return sqr if sqr
+  end
+  nil
+end
+
+def find_risk_or_win(line, brd, marker)
+  if brd.values_at(*line).count(marker) == 2
+    brd.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
+  end
 end
 
 # def winner_sequence(winner)
@@ -159,13 +193,13 @@ loop do
   scores = { 'player' => 0, 'computer' => 0 }
 
   loop do
-    # assign starting player
+    # current_player = who_goes_first
     current_player = 'player'
     board = initialize_board
 
     loop do
       display_board(board, scores)
-      sleep(1.15) unless board.values.all?(" ")
+      sleep(1) unless board.values.all?(" ")
       place_marker!(board, current_player)
       current_player = alternate_player(current_player)
       break if someone_won?(board) || board_full?(board)
@@ -177,9 +211,10 @@ loop do
     display_game_result(board, scores, game_result)
 
     break if victory?(scores)
+    # current_player = %w(player computer).sample
   end
 
-  #winner_sequence
+  # winner_sequence
   break unless play_again?
 end
 
