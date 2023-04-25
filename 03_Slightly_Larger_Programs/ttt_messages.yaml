@@ -1,0 +1,16 @@
+welcome: " Welcome to Tic Tac Toe! <="
+
+# rules:
+
+choose_square: "Choose a square to place your marker: "
+invalid_choice: "Sorry, that's an invalid choice."
+
+win_round: "wins this round!"
+
+player: "Great job! You've won the round!"
+computer: "The computer won this round."
+tie: "Cats game! It's a tie!"
+
+again: "Would you like to play another match? (y or n)"
+y_or_n: "Please enter y or n.\n"
+bye: "Thank you for playing Tic Tac Toe! Good bye!"
