@@ -1,6 +1,25 @@
 welcome: " Welcome to Tic Tac Toe! <="
+welcome_options: "1. play game  2. view instructions"
+one_or_two: "Please enter 1 or 2."
 
-# rules:
+rules_1: "=> This is the game board. Each square is represented by a number."
+rules_2: "=> If you wanted to select the middle square you would enter 5."
+rules_3: "5"
+rules_4: "=> The square will then be marked by your marker."
+rules_5: "=> YOU, the PLAYER, will be represented by X."
+rules_6: "=> The COMPUTER will be represented by O."
+rules_7: "\n=> The first to win 5 games will win the match!\n"
+
+who_goes_first: "Who do you want to go first? <="
+whos_first_options: "1. player    2. computer    3. let the computer decide"
+one_two_three: "Please enter 1, 2, or 3."
+
+every_round?: "What do you want to do? <="
+choose_1: "1. choose who goes first after each round"
+choose_2: "2. automatically alternate who goes first each round"
+
+x_and_o: "You will be X. Computer will be O."
+up_first: " will go first! Good luck!"
 
 choose_square: "Choose a square to place your marker: "
 invalid_choice: "Sorry, that's an invalid choice."
@@ -10,6 +29,9 @@ win_round: "wins this round!"
 player: "Great job! You've won the round!"
 computer: "The computer won this round."
 tie: "Cats game! It's a tie!"
+
+player_wins: "You are VICTORIOUS!!"
+computer_wins: "The computer won."
 
 again: "Would you like to play another match? (y or n)"
 y_or_n: "Please enter y or n.\n"

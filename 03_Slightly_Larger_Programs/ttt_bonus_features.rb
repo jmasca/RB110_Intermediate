@@ -8,25 +8,14 @@ WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9], # rows
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
+WINS_FOR_VICTORY = 5
 
 def prompt(msg)
   puts "=> #{msg}"
 end
 
-def display_welcome_message
-  system "clear"
-  puts "=> #{MESSAGES['welcome']}".center(80)
-end
-
-# def display_guide_board
-#   guide_board = {}
-#   (1..9).each { |num| guide_board[num] = num }
-#   display_board(guide_board)
-# end
-
-def display_board(brd, scores)
-  display_score(scores)
-  # puts "You are #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}.\n\n\n"
+def display_board(brd, scores={})
+  display_score(scores) unless scores.empty?
   brd_arr = ["",                                            # 0
              "     |     |     ",                           # 1
              "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}  ",   # 2
@@ -129,19 +118,15 @@ def play_again?
   answer == 'y'
 end
 
-def end_of_round_pause
-  puts "\nPress Enter to continue..."
-  gets.chomp
-end
-
 def victory?(scores)
-  scores.value?(5)
+  scores.value?(WINS_FOR_VICTORY)
 end
 
 def display_game_result(brd, scores, result)
   display_board(brd, scores)
   prompt MESSAGES[result]
-  end_of_round_pause
+  sleep(1)
+  enter_to_continue
 end
 
 def place_marker!(brd, current_player)
@@ -179,42 +164,174 @@ def find_risk_or_win(line, brd, marker)
   end
 end
 
-# def winner_sequence(winner)
-#   system "clear"
-# end
+def welcome_sequence
+  display_welcome_message
+  sleep(0.75)
+  users_choice = welcome_options
+  view_instructions if users_choice == '2'
+end
 
-# def view_quick_guide
-#   display_guide_board
-# end
+def display_welcome_message
+  system "clear"
+  sleep(0.5)
+  puts "=> #{MESSAGES['welcome']}".center(80), "\n\n"
+end
+
+def welcome_options
+  puts MESSAGES['welcome_options'].to_s.center(80)
+  loop do
+    choice = gets.chomp
+    return choice if %w(1 2).include?(choice)
+    prompt MESSAGES['one_or_two']
+  end
+end
+
+def enter_to_continue
+  puts "\nPress Enter to continue..."
+  gets.chomp
+end
+
+def view_instructions
+  display_guide_board
+  sleep(0.75)
+  display_rules((1..3))
+  enter_to_continue
+  system "clear"
+  display_guide_board
+  sleep(0.75)
+  system "clear"
+  display_guide_board(true)
+  sleep(0.75)
+  display_rules((4..7))
+  enter_to_continue
+end
+
+def display_guide_board(example=false)
+  system "clear"
+  guide_board = {}
+  (1..9).each do |num|
+    guide_board[num] = if example && num == 5
+                         PLAYER_MARKER
+                       else
+                         num
+                       end
+  end
+  display_board(guide_board)
+end
+
+def display_rules(rules_lines)
+  rules = 'rules_0'
+  rules_lines.each do |n|
+    rules[-1] = n.to_s
+    puts MESSAGES[rules]
+    sleep(1.25)
+  end
+end
+
+def who_goes_first
+  system "clear"
+  puts "=> #{MESSAGES['who_goes_first']}".center(80), "\n"
+  sleep(0.75)
+  puts MESSAGES['whos_first_options'].to_s.center(80)
+  users_choice
+end
+
+def users_choice
+  loop do
+    first = gets.chomp
+    case first
+    when '1' then return 'player'
+    when '2' then return 'computer'
+    when '3' then return %w(player computer).sample
+    end
+    prompt MESSAGES['one_two_three']
+  end
+end
+
+def whos_first_every_round?
+  display_choose_every_round_options
+  choice = ''
+  loop do
+    choice = gets.chomp
+    break if %w(1 2).include?(choice)
+    prompt MESSAGES['one_or_two']
+  end
+  choice == '1'
+end
+
+def display_choose_every_round_options
+  puts "\n", "=> #{MESSAGES['every_round?']}".center(80), "\n"
+  sleep(0.5)
+  puts MESSAGES['choose_1'].to_s.center(80), "\n"
+  puts MESSAGES['choose_2'].to_s.center(80), "\n"
+end
+
+def intro(player, scores)
+  system "clear"
+  sleep(0.50)
+  whos_x_and_o if scores.values.all?(0)
+  puts "#{player.upcase}#{MESSAGES['up_first']}".center(80)
+  sleep(1.75)
+end
+
+def whos_x_and_o
+  puts MESSAGES['x_and_o'].to_s.center(80), "\n"
+  sleep(1.11)
+end
+
+def winning_sequence(winner)
+  winner == 'player' ? player_wins : computer_wins
+  sleep(1.85)
+  puts "\n\n\n"
+end
+
+def player_wins
+  4.times do
+    system "clear"
+    sleep(0.36)
+    puts "=> CONGRATULATIONS!!! <=".center(80)
+    sleep(0.36)
+  end
+  sleep(0.25)
+  puts "\n", MESSAGES['player_wins'].to_s.center(80)
+end
+
+def computer_wins
+  system "clear"
+  puts MESSAGES['computer_wins'].to_s.center(80)
+end
 
 # ---------------------------------- main ----------------------------------- #
-# welcome_sequence
+welcome_sequence
 loop do
   scores = { 'player' => 0, 'computer' => 0 }
+  starting_player = who_goes_first
+  always_choose = whos_first_every_round?
+  game_result = ''
 
   loop do
-    # current_player = who_goes_first
-    current_player = 'player'
+    intro(starting_player, scores)
     board = initialize_board
+    current_player = starting_player
 
     loop do
       display_board(board, scores)
-      sleep(1) unless board.values.all?(" ")
+      sleep(1) unless board.values.all?(" ") && current_player == 'player'
       place_marker!(board, current_player)
-      current_player = alternate_player(current_player)
       break if someone_won?(board) || board_full?(board)
+      current_player = alternate_player(current_player)
     end
 
     game_result = winner_or_tie(board)
-
     update_score!(scores, game_result)
     display_game_result(board, scores, game_result)
 
     break if victory?(scores)
-    # current_player = %w(player computer).sample
+    starting_player = if always_choose then who_goes_first
+                      else alternate_player(starting_player) end
   end
 
-  # winner_sequence
+  winning_sequence(game_result)
   break unless play_again?
 end
 
