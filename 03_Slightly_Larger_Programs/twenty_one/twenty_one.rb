@@ -89,11 +89,11 @@ def display_total(cards)
 end
 
 def display_hand(hand, who)
-  prompt MESSAGES[who + '_hand']
+  prompt MESSAGES["#{who}_hand"]
   display_cards(hand)
 
   unless bust?(hand)
-    prompt MESSAGES[who + '_total']
+    prompt MESSAGES["#{who}_total"]
     display_total(hand)
   end
 end
@@ -105,7 +105,7 @@ end
 
 def display_hand_winner(winner)
   sleep(1)
-  prompt MESSAGES[winner + '_wins']
+  prompt MESSAGES["#{winner}_wins"]
   sleep(3)
 end
 
@@ -115,7 +115,7 @@ def display_scoreboard(scoreboard)
   who = ['player', 'dealer']
   print MESSAGES['scoreboard'].rjust(23)
 
-  (0..1).each { |n| print MESSAGES[who[n] + '_score'], scoreboard[n] }
+  2.times { |n| print MESSAGES["#{who[n]}_score"], scoreboard[n] }
 
   blank_line(5)
   unless scoreboard.any?(5)
@@ -125,7 +125,7 @@ def display_scoreboard(scoreboard)
 end
 
 def display_game_winner(winner)
-  prompt MESSAGES[winner + '_wins_game']
+  prompt MESSAGES["#{winner}_wins_game"]
   sleep(1)
 end
 
@@ -283,29 +283,29 @@ def sequence_dealer_turn(hands)
 end
 
 def sequence_hit(hand, who)
-  prompt MESSAGES[who + '_hit']
+  prompt MESSAGES["#{who}_hit"]
   sleep(1.25)
 
-  prompt MESSAGES[who + '_received']
+  prompt MESSAGES["#{who}_received"]
   puts hand[-1].join(' of ')
   sleep(1.25)
 
   separator
-  display_hand(hand, who + '_updated')
+  display_hand(hand, "#{who}_updated")
 end
 
 def sequence_bust(hand, who)
   blank_line if who == 'player'
 
   prompt MESSAGES['bust']
-  prompt MESSAGES[who + '_bust']
+  prompt MESSAGES["#{who}_bust"]
   display_total(hand)
   blank_line
   puts '=' * 15
 end
 
 def sequence_stay(hand, who)
-  prompt MESSAGES[who + '_stay'] + sum_of_cards(hand).to_s + "\n"
+  prompt "#{MESSAGES["#{who}_stay"]}#{sum_of_cards(hand)}\n"
 end
 
 def sequence_compare_cards(hands)
